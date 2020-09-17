@@ -3,6 +3,7 @@ package com.example.chatapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class LoginActivity extends AppCompatActivity {
 
     EditText emailText, passwordText;
-    Button signInButton;
+    Button signInButton,buttonSignUp;
     TextView ResetPassword;
     String emailString, passwordString;
 
@@ -29,12 +30,17 @@ public class LoginActivity extends AppCompatActivity {
         emailText = findViewById(R.id.emailId);
         passwordText = findViewById(R.id.editPassword);
         signInButton = findViewById(R.id.signInButton);
+        buttonSignUp = findViewById(R.id.buttonSignup);
+
 
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 emailString = emailText.getText().toString().trim();
                 passwordString = passwordText.getText().toString().trim();
+
                 if(emailString.isEmpty()){
                     emailText.setError("Something wrong");
                 }
@@ -54,6 +60,13 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+
+        buttonSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this,SignupActivity.class));
             }
         });
 
