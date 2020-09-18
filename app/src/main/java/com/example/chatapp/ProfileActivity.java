@@ -2,27 +2,27 @@ package com.example.chatapp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import android.os.Bundle;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -34,98 +34,148 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 
-public class SignupActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
-
-   private EditText signupName, signupEmail,signupPassword,signupConfirmPassword;
-   private Button signupButton;
-    private String stringSignupName, stringSignupEmail,stringSignupPassword,stringSignupConfirmPassword;
+   private EditText signupName, signupEmail;
+   private Button signupButton,logoutButton;
+    private String stringSignupName, stringSignupEmail;
     private FirebaseUser firebaseUser;
     private DatabaseReference databaseReference;
     private Uri localPathUri, serverPathUri;
-    private ImageView profileImage;
+   private ImageView profileImage;
+
 
     private StorageReference storageReference;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
+        setContentView(R.layout.activity_profile);
 
-        signupName = findViewById(R.id.signupName);
-        signupEmail = findViewById(R.id.signupEmailId);
-        signupPassword = findViewById(R.id.signupEditPassword);
-        signupConfirmPassword = findViewById(R.id.signupEditConfirmPassword);
-        signupButton = findViewById(R.id.signupButton);
-        profileImage = findViewById(R.id.profileImage);
-
+        signupName = findViewById(R.id.profileName);
+        signupEmail = findViewById(R.id.profileEmailId);
+        signupButton = findViewById(R.id.updateButton);
+        profileImage = findViewById(R.id.profileUpdateImage);
+        logoutButton = findViewById(R.id.logoutButton);
 
         storageReference = FirebaseStorage.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
+        if(firebaseUser!=null){
+            signupName.setText(firebaseUser.getDisplayName());
+            signupEmail.setText(firebaseUser.getEmail());
+            serverPathUri = firebaseUser.getPhotoUrl();
 
+            if(serverPathUri !=null){
+                //for showing images from server, when need to use some library like glide library
+                Glide.with(this).load(serverPathUri).placeholder(R.drawable.face).error(R.drawable.face).into(profileImage);
+            }
+        }
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signOut();
+                startActivity(new Intent(ProfileActivity.this,LoginActivity.class));
+                finish();
+            }
+        });
 
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                stringSignupName = signupName.getText().toString().trim();
-                stringSignupEmail = signupEmail.getText().toString().trim();
-                stringSignupPassword = signupPassword.getText().toString().trim();
-                stringSignupConfirmPassword = signupConfirmPassword.getText().toString().trim();
-
-
-                if(stringSignupName.equals("")){
-                    signupName.setError("Something Wrong");
+                if(signupName.getText().toString().isEmpty()){
+                    signupName.setError("Something wrong");
                 }
-                else if(stringSignupEmail.isEmpty()){
-                    signupEmail.setError("Something Wrong");
-                }
-                else if(stringSignupPassword.isEmpty()){
-                    signupPassword.setError("Something Wrong");
-                }
-                else if(stringSignupConfirmPassword.isEmpty()){
-                    signupConfirmPassword.setError("Something Wrong");
-                }
-                else if(stringSignupPassword.equals(stringSignupConfirmPassword) == false){
-                    signupConfirmPassword.setError("Not Matched");
+                else if(localPathUri == null){
+                    updateNameOnly();
                 }
                 else{
-                    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                    firebaseAuth.createUserWithEmailAndPassword(stringSignupEmail,stringSignupPassword).addOnCompleteListener(
-                            new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if(task.isSuccessful()){
-                                        firebaseUser = firebaseAuth.getCurrentUser();
-                                        if(localPathUri.getPath().isEmpty()==false) updatePhotoAndName();
-                                        else  updateNameOnly();
-                                    }
-                                    else{
-                                        Toast.makeText(SignupActivity.this, "Failed: "+task.getException(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            }
-                    );
+                    updatePhotoAndName();
                 }
             }
         });
+
 
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(ActivityCompat.checkSelfPermission(SignupActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent,101);
-                }
-                else {
-                    ActivityCompat.requestPermissions(SignupActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 102);
-                }
+                changeImage(v);
             }
         });
-
     }
 
-    @Override
+
+
+    private void changeImage(View view){
+        if(serverPathUri == null){
+            pickImage();
+        }
+        else{
+            final PopupMenu popupMenu = new PopupMenu(this,view);
+            popupMenu.getMenuInflater().inflate(R.menu.menu_picture,popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    int id = item.getItemId();
+                    if(id == R.id.changePicture){
+                        pickImage();
+                    }
+                    else if(id == R.id.removePhoto){
+
+                        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder().setDisplayName(signupName.getText().toString().trim()).
+                                setPhotoUri(null).build();
+                        firebaseUser.updateProfile(request).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    String userID = firebaseUser.getUid();
+                                    databaseReference = FirebaseDatabase.getInstance().getReference().child(NodeNames.USERS);
+
+                                    HashMap<String,String> hashMap = new HashMap<>();
+                                    hashMap.put(NodeNames.NAME,signupName.getText().toString().trim());
+
+                                    hashMap.put(NodeNames.PHOTO,"");
+
+                                    databaseReference.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                Toast.makeText(ProfileActivity.this, "Successfully Updated", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+
+                                }
+                                else{
+                                    Toast.makeText(ProfileActivity.this, "Failed to Update", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+                    }
+
+                    return false;
+                }
+            });
+            popupMenu.show();
+        }
+    }
+
+    private void pickImage(){
+        if(ActivityCompat.checkSelfPermission(ProfileActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intent,101);
+        }
+        else {
+            ActivityCompat.requestPermissions(ProfileActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 102);
+        }
+    }
+
+
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
@@ -134,7 +184,7 @@ public class SignupActivity extends AppCompatActivity {
             startActivityForResult(intent,101);
         }
         else{
-            Toast.makeText(SignupActivity.this, "Access is Required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ProfileActivity.this, "Access is Required", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -146,6 +196,7 @@ public class SignupActivity extends AppCompatActivity {
             profileImage.setImageURI(localPathUri);
         }
     }
+
 
     public void updatePhotoAndName(){
         String strFilename = firebaseUser.getUid()+".jpg";
@@ -170,23 +221,22 @@ public class SignupActivity extends AppCompatActivity {
 
                                         HashMap<String,String> hashMap = new HashMap<>();
                                         hashMap.put(NodeNames.NAME,signupName.getText().toString().trim());
-                                        hashMap.put(NodeNames.EMAIL,signupEmail.getText().toString().trim());
-                                        hashMap.put(NodeNames.ONLINE,"true");
+
                                         hashMap.put(NodeNames.PHOTO,serverPathUri.getPath());
 
                                         databaseReference.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
-                                                    Toast.makeText(SignupActivity.this, "Successfully Created", Toast.LENGTH_SHORT).show();
-                                                    startActivity(new Intent(SignupActivity.this,LoginActivity.class));
+                                                    Toast.makeText(ProfileActivity.this, "Successfully updated", Toast.LENGTH_SHORT).show();
+                                                    finish();
                                                 }
                                             }
                                         });
 
                                     }
                                     else{
-                                        Toast.makeText(SignupActivity.this, "Failed to Update", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ProfileActivity.this, "Failed to Update", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
@@ -212,28 +262,26 @@ public class SignupActivity extends AppCompatActivity {
 
                     HashMap<String,String> hashMap = new HashMap<>();
                     hashMap.put(NodeNames.NAME,signupName.getText().toString().trim());
-                    hashMap.put(NodeNames.EMAIL,signupEmail.getText().toString().trim());
-                    hashMap.put(NodeNames.ONLINE,"true");
-                    hashMap.put(NodeNames.PHOTO,"");
+
 
                     databaseReference.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
-                                Toast.makeText(SignupActivity.this, "Successfully Created", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignupActivity.this,LoginActivity.class));
-                            }
-                            else{
-                                Toast.makeText(SignupActivity.this, "Failed to created", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ProfileActivity.this, "Successfully updated", Toast.LENGTH_SHORT).show();
+                                finish();
                             }
                         }
                     });
 
                 }
                 else{
-                    Toast.makeText(SignupActivity.this, "Failed to Update", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, "Failed to Update", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
+
+
+
 }
