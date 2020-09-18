@@ -37,7 +37,7 @@ import java.util.HashMap;
 public class ProfileActivity extends AppCompatActivity {
 
    private EditText signupName, signupEmail;
-   private Button signupButton,logoutButton;
+   private Button signupButton,logoutButton,passwordchangeButton;
     private String stringSignupName, stringSignupEmail;
     private FirebaseUser firebaseUser;
     private DatabaseReference databaseReference;
@@ -58,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
         signupButton = findViewById(R.id.updateButton);
         profileImage = findViewById(R.id.profileUpdateImage);
         logoutButton = findViewById(R.id.logoutButton);
+        passwordchangeButton = findViewById(R.id.passwordchangeButton);
 
         storageReference = FirebaseStorage.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -106,6 +107,15 @@ public class ProfileActivity extends AppCompatActivity {
                 changeImage(v);
             }
         });
+
+
+        passwordchangeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ProfileActivity.this,PasswordChangeActivity.class));
+            }
+        });
+
     }
 
 

@@ -79,15 +79,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
-        android:layout_marginTop="61dp"
+        android:layout_marginTop="25dp"
         android:layout_marginRight="30dp"
         android:backgroundTint="@android:color/holo_red_dark"
-        android:text="Sign out"
 
+        android:text="Sign out"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordchangeButton" />
+
+    <Button
+        android:id="@+id/passwordchangeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginRight="30dp"
+        android:text="Change Password"
+        app:backgroundTint="@color/colorPrimaryDark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/updateButton" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
