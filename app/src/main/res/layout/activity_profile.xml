@@ -7,6 +7,9 @@
     android:background="@color/colorAccent"
     tools:context=".ProfileActivity">
 
+    <include layout="@layout/progress_bar"
+        android:id="@+id/pbProfile"
+        android:visibility="gone"/>
     <ImageView
         android:id="@+id/profileUpdateImage"
         android:layout_width="258dp"

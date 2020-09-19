@@ -3,6 +3,7 @@ package com.example.chatapp;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.os.Bundle;
@@ -44,7 +45,7 @@ public class SignupActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private Uri localPathUri, serverPathUri;
     private ImageView profileImage;
-
+    private View progressBar;
     private StorageReference storageReference;
 
     @Override
@@ -57,6 +58,7 @@ public class SignupActivity extends AppCompatActivity {
         signupPassword = findViewById(R.id.signupEditPassword);
         signupConfirmPassword = findViewById(R.id.signupEditConfirmPassword);
         signupButton = findViewById(R.id.signupButton);
+        progressBar = findViewById(R.id.pbSignUp);
         profileImage = findViewById(R.id.profileImage);
 
 
@@ -89,6 +91,9 @@ public class SignupActivity extends AppCompatActivity {
                 else if(stringSignupPassword.equals(stringSignupConfirmPassword) == false){
                     signupConfirmPassword.setError("Not Matched");
                 }
+                else if(localPathUri == null){
+                    Toast.makeText(SignupActivity.this, "Select Profile Photo ", Toast.LENGTH_SHORT).show();
+                }
                 else{
                     final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                     firebaseAuth.createUserWithEmailAndPassword(stringSignupEmail,stringSignupPassword).addOnCompleteListener(
@@ -97,8 +102,8 @@ public class SignupActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if(task.isSuccessful()){
                                         firebaseUser = firebaseAuth.getCurrentUser();
-                                        if(localPathUri.getPath().isEmpty()==false) updatePhotoAndName();
-                                        else  updateNameOnly();
+                                        updatePhotoAndName();
+
                                     }
                                     else{
                                         Toast.makeText(SignupActivity.this, "Failed: "+task.getException(), Toast.LENGTH_SHORT).show();
@@ -148,6 +153,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void updatePhotoAndName(){
+        progressBar.setVisibility(View.VISIBLE);
         String strFilename = firebaseUser.getUid()+".jpg";
         final StorageReference storageRef = storageReference.child("images/"+strFilename);
         storageRef.putFile(localPathUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -164,7 +170,9 @@ public class SignupActivity extends AppCompatActivity {
                             firebaseUser.updateProfile(request).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
+                                    progressBar.setVisibility(View.GONE);
                                     if(task.isSuccessful()){
+                                        progressBar.setVisibility(View.VISIBLE);
                                         String userID = firebaseUser.getUid();
                                         databaseReference = FirebaseDatabase.getInstance().getReference().child(NodeNames.USERS);
 
@@ -177,6 +185,7 @@ public class SignupActivity extends AppCompatActivity {
                                         databaseReference.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
+                                                progressBar.setVisibility(View.GONE);
                                                 if(task.isSuccessful()){
                                                     Toast.makeText(SignupActivity.this, "Successfully Created", Toast.LENGTH_SHORT).show();
                                                     startActivity(new Intent(SignupActivity.this,LoginActivity.class));
@@ -202,11 +211,14 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void updateNameOnly(){
+        progressBar.setVisibility(View.VISIBLE);
         UserProfileChangeRequest request = new UserProfileChangeRequest.Builder().setDisplayName(signupName.getText().toString().trim()).build();
         firebaseUser.updateProfile(request).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
+                    progressBar.setVisibility(View.VISIBLE);
                     String userID = firebaseUser.getUid();
                     databaseReference = FirebaseDatabase.getInstance().getReference().child(NodeNames.USERS);
 
@@ -219,6 +231,7 @@ public class SignupActivity extends AppCompatActivity {
                     databaseReference.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
+                            progressBar.setVisibility(View.GONE);
                             if(task.isSuccessful()){
                                 Toast.makeText(SignupActivity.this, "Successfully Created", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(SignupActivity.this,LoginActivity.class));

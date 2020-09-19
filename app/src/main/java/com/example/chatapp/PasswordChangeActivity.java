@@ -19,6 +19,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
     private EditText etPassword,etConfirmPassword;
     private Button confirmButton;
     String password,confirmPassword;
+    private View progressBar;
 
 
     @Override
@@ -28,6 +29,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.passwordEfittext);
         etConfirmPassword = findViewById(R.id.confirmPasswordEdittext);
         confirmButton = findViewById(R.id.confirmPasswordButton);
+        progressBar = findViewById(R.id.pbPassword);
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,6 +48,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
                     etConfirmPassword.setError("Not matched");
                 }
                 else{
+                    progressBar.setVisibility(View.VISIBLE);
                     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                     FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
@@ -53,6 +56,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
                         firebaseUser.updatePassword(password).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
+                                progressBar.setVisibility(View.GONE);
                                 if(task.isSuccessful()){
                                     Toast.makeText(PasswordChangeActivity.this, "Successfully Changed", Toast.LENGTH_SHORT).show();
                                     finish();

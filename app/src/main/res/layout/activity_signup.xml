@@ -7,6 +7,9 @@
     android:background="@color/colorAccent"
     tools:context=".SignupActivity">
 
+    <include layout="@layout/progress_bar"
+        android:id="@+id/pbSignUp"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/profileImage"

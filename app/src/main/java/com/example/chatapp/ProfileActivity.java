@@ -43,6 +43,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private Uri localPathUri, serverPathUri;
    private ImageView profileImage;
+   private View progressBar;
 
 
     private StorageReference storageReference;
@@ -59,6 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileUpdateImage);
         logoutButton = findViewById(R.id.logoutButton);
         passwordchangeButton = findViewById(R.id.passwordchangeButton);
+        progressBar = findViewById(R.id.pbProfile);
 
         storageReference = FirebaseStorage.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -92,9 +94,11 @@ public class ProfileActivity extends AppCompatActivity {
                     signupName.setError("Something wrong");
                 }
                 else if(localPathUri == null){
+                    progressBar.setVisibility(View.VISIBLE);
                     updateNameOnly();
                 }
                 else{
+                    progressBar.setVisibility(View.VISIBLE);
                     updatePhotoAndName();
                 }
             }
@@ -225,6 +229,7 @@ public class ProfileActivity extends AppCompatActivity {
                             firebaseUser.updateProfile(request).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
+                                    progressBar.setVisibility(View.GONE);
                                     if(task.isSuccessful()){
                                         String userID = firebaseUser.getUid();
                                         databaseReference = FirebaseDatabase.getInstance().getReference().child(NodeNames.USERS);
@@ -266,6 +271,7 @@ public class ProfileActivity extends AppCompatActivity {
         firebaseUser.updateProfile(request).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
                     String userID = firebaseUser.getUid();
                     databaseReference = FirebaseDatabase.getInstance().getReference().child(NodeNames.USERS);

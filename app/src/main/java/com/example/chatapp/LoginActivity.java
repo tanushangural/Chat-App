@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView ResetPassword;
     String emailString, passwordString;
     private TextView textView;
-
+    private View progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordText = findViewById(R.id.editPassword);
         signInButton = findViewById(R.id.signInButton);
         buttonSignUp = findViewById(R.id.buttonSignup);
+        progressBar = findViewById(R.id.pbSignIn);
 
         textView = findViewById(R.id.textView);
         textView.setOnClickListener(new View.OnClickListener() {
@@ -57,10 +59,12 @@ public class LoginActivity extends AppCompatActivity {
                     passwordText.setError("Something wrong");
                 }
                 else{
+                    progressBar.setVisibility(View.VISIBLE);
                     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                     firebaseAuth.signInWithEmailAndPassword(emailString,passwordString).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBar.setVisibility(View.GONE);
                             if(task.isSuccessful()){
                                 Toast.makeText(LoginActivity.this,"Login successfull",Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(LoginActivity.this,MainActivity.class));
