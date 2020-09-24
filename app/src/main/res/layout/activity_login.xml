@@ -51,6 +51,7 @@
         android:hint="Enter Password"
         android:layout_marginTop="50dp"
         android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:ems="10"
         android:inputType="textPassword"
         android:textColor="#FFFFFF"
