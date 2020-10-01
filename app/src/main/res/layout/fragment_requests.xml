@@ -6,11 +6,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".requestsFragment">
 
+    <include layout="@layout/progress_bar"
+        android:id="@+id/pbFragmentRequests"
+        android:visibility="gone"
+        ></include>
     <TextView
         android:id="@+id/tvRequests"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Empty Requests List"
+        android:visibility="visible"
         android:textSize="20dp"
 
         app:layout_constraintBottom_toBottomOf="parent"

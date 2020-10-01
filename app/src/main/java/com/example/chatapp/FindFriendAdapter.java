@@ -57,7 +57,9 @@ public class FindFriendAdapter extends RecyclerView.Adapter<FindFriendAdapter.Fi
     @Override
     public void onBindViewHolder(@NonNull final FindFriendAdapter.FindFriendViewHolder holder, int position) {
         final FindFriendClass friendModel = findFriendModelList.get(position);
-
+        friendRequestDatabase = FirebaseDatabase.getInstance().getReference().child(NodeNames.FRIEND_REQUESTS);
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        Uri photoUrl = currentUser.getPhotoUrl();
         holder.tvFullName.setText(friendModel.getUsername());
         StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(Constants.IMAGES_FOLDER + "/" + friendModel.getPhotoname());
         fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -72,8 +74,9 @@ public class FindFriendAdapter extends RecyclerView.Adapter<FindFriendAdapter.Fi
             }
         });
 
-        friendRequestDatabase = FirebaseDatabase.getInstance().getReference().child(NodeNames.FRIEND_REQUESTS);
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+
+
 
         if(friendModel.isSentRequest())
         {

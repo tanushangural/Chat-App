@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -94,13 +95,12 @@ public class findFriendsFragment extends Fragment {
                         final String fullName = ds.child(NodeNames.NAME).getValue().toString();
                         final String photoName = ds.child(NodeNames.PHOTO).getValue()!=null? ds.child(NodeNames.PHOTO).getValue().toString():"";
 
-                        databaseReferenceFriendRequests.child(userId);
-                        databaseReferenceFriendRequests.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                        databaseReferenceFriendRequests.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.exists()) {
-                                    String requestType = dataSnapshot.child("request_type").getValue().toString();
-
+                                    String requestType = dataSnapshot.child(NodeNames.REQUEST_TYPE).getValue().toString();
                                     if(requestType.equals(Constants.REQUEST_STATUS_SENT)){
                                         findFriendModelList.add(new FindFriendClass(fullName, photoName, userId, true));
                                         findFriendAdapter.notifyDataSetChanged();
