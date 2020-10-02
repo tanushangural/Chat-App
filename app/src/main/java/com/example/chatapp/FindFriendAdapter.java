@@ -78,6 +78,8 @@ public class FindFriendAdapter extends RecyclerView.Adapter<FindFriendAdapter.Fi
 
 
 
+
+
         if(friendModel.isSentRequest())
         {
             holder.btnSendRequest.setVisibility(View.GONE);

@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:id="@+id/friendRequestLayout"
+        android:id="@+id/chatLIstLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -67,11 +67,10 @@
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/colorPrimary"
                     android:layout_weight="1"
-                    tools:visibility="visible"
-                    android:background="@color/colorPrimary"
-                    android:visibility="gone" />
+                    android:backgroundTint="@color/colorPrimary"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
             </LinearLayout>
 
         </LinearLayout>
