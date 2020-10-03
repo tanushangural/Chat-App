@@ -1,6 +1,7 @@
 package com.example.chatapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,7 @@ public class ChatlistAdapter extends RecyclerView.Adapter<ChatlistAdapter.Chatli
     @Override
     public void onBindViewHolder(@NonNull final ChatlistViewHolder holder, int position) {
 
-        ChatlistModel chatlistModel = chatlistModelList.get(position);
+        final ChatlistModel chatlistModel = chatlistModelList.get(position);
         holder.fullnameCL.setText(chatlistModel.getUsername());
 
         StorageReference fileref = FirebaseStorage.getInstance().getReference().child(Constants.IMAGES_FOLDER+"/"+chatlistModel.getPhotoname());
@@ -51,6 +52,14 @@ public class ChatlistAdapter extends RecyclerView.Adapter<ChatlistAdapter.Chatli
             }
         });
 
+        holder.llChatList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,ChatActivity.class);
+                intent.putExtra("user_key",chatlistModel.getUserId());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -93,10 +93,6 @@ public class ProfileActivity extends AppCompatActivity {
                 if(signupName.getText().toString().isEmpty()){
                     signupName.setError("Something wrong");
                 }
-                else if(localPathUri == null){
-                    progressBar.setVisibility(View.VISIBLE);
-                    updateNameOnly();
-                }
                 else{
                     progressBar.setVisibility(View.VISIBLE);
                     updatePhotoAndName();
