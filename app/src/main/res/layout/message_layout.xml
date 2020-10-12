@@ -10,7 +10,7 @@
         android:id="@+id/llmessageSent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/colorLightGreen"
+        android:background="@drawable/sent_message_background"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,7 +22,7 @@
             android:layout_weight="1"
             android:autoLink="all"
             android:gravity="right"
-            android:padding="10dp"
+            android:padding="6dp"
             android:textColorLink="@color/colorPrimary"
             android:textSize="20sp"
             tools:text="hello world" />
@@ -33,6 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="bottom"
+            android:padding="4dp"
             android:text="20:00" />
     </LinearLayout>
 
@@ -40,8 +41,9 @@
         android:id="@+id/llmessageRecieved"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="@drawable/recieved_message_background"
         android:orientation="horizontal"
+        android:padding="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/llmessageSent">
 
@@ -52,7 +54,7 @@
             android:layout_weight="1"
             android:autoLink="all"
             android:gravity="right"
-            android:padding="10dp"
+            android:padding="6dp"
             android:textColorLink="@color/colorPrimary"
             android:textSize="20sp"
             tools:text="hello world" />
