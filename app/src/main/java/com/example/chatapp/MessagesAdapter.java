@@ -49,17 +49,26 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         String dateTime = simpleDateFormat.format(new Date(message.getMessageTime()));
         String[] strings = dateTime.split(" ");
         String messageTime = strings[1];
-
+        AESAlgo aesAlgo = new AESAlgo();
+        String ecryptMessage = message.getMessage();
+        String decryptMessage = null;
+        try {
+            decryptMessage = aesAlgo.decrypt(ecryptMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(currentuserId.equals(fromUserId)){
             holder.llmessageSent.setVisibility(View.VISIBLE);
             holder.llmessageRecieved.setVisibility(View.GONE);
-            holder.tvSentMessage.setText(message.getMessage());
+
+
+            holder.tvSentMessage.setText(decryptMessage);
             holder.tvSentMessageTime.setText(messageTime);
         }
         else{
             holder.llmessageRecieved.setVisibility(View.VISIBLE);
             holder.llmessageSent.setVisibility(View.GONE);
-            holder.tvRecieveMessage.setText(message.getMessage());
+            holder.tvRecieveMessage.setText(decryptMessage);
             holder.tvRecieveMessageTime.setText(messageTime);
         }
 

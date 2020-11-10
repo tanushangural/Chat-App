@@ -26,13 +26,6 @@
             android:inputType="textLongMessage" />
 
         <ImageView
-            android:id="@+id/ivAttachment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            app:srcCompat="@drawable/ic_attach_file_black_24dp" />
-
-        <ImageView
             android:id="@+id/ivSendMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

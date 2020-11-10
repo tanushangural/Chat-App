@@ -24,9 +24,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -35,7 +47,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     DatabaseReference rootRef;
     FirebaseAuth firebaseAuth;
     String currentuserId, chatuserId;
-
     private RecyclerView rvMessages;
     private SwipeRefreshLayout swlMessages;
     private MessagesAdapter messagesAdapter;
@@ -52,7 +63,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_chat);
 
         etSentMessage = findViewById(R.id.etMessage);
-        ivAttachment = findViewById(R.id.ivAttachment);
         ivSend = findViewById(R.id.ivSendMessage);
 
         rvMessages = findViewById(R.id.rvChatActivity);
@@ -167,16 +177,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        AESAlgo aesAlgo = new AESAlgo();
 
         switch (v.getId()){
             case R.id.ivSendMessage:
 
                 DatabaseReference userMessagePush = rootRef.child(NodeNames.MESSAGES).child(currentuserId).child(chatuserId).push();
                 String pushId = userMessagePush.getKey();
+                String normalMessage = etSentMessage.getText().toString();
+                try {
+                    String encryptedMessage = aesAlgo.encrypt(normalMessage);
+                    sendMessage(encryptedMessage,Constants.MESSAGE_TYPE_TEXT,pushId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Failed to send message ", Toast.LENGTH_SHORT).show();
+                }
 
-                sendMessage(etSentMessage.getText().toString(),Constants.MESSAGE_TYPE_TEXT,pushId);
                 break;
         }
 
     }
+
 }
